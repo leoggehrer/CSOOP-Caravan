@@ -8,6 +8,11 @@ namespace Caravan.Logic
     /// </summary>
     public abstract class PackAnimal
     {
+        #region fields
+        private int _load = 0;
+        private Caravan? _myCaravan;
+        #endregion fields
+
         /// <summary>
         /// Name des Tiers und Maximalgeschwindigkeit des Tiers
         /// </summary>
@@ -25,7 +30,6 @@ namespace Caravan.Logic
         /// </summary>
         public int MaxPace { get; protected set; }
 
-        private int _load = 0;
         /// <summary>
         /// Anzahl der Ballen, die das Tier trägt
         /// </summary>
@@ -44,10 +48,21 @@ namespace Caravan.Logic
         /// Karawane, in der das Tier mitläuft. Kann einfach durch Zuweisung 
         /// gewechselt werden. Umkettung in Karawanen erfolgt automatisch
         /// </summary>
-        public Caravan MyCaravan 
+        public Caravan? MyCaravan 
         {
-            get { return null; }
-            set { ; }
+            get { return _myCaravan; }
+            set 
+            {
+                if (_myCaravan == null)
+                {
+                    _myCaravan = value;
+                }
+                else if (_myCaravan != value)
+                {
+                    _myCaravan.RemovePackAnimal(this);
+                    _myCaravan = value;
+                }
+            }
         }
     }
 }

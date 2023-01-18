@@ -1,7 +1,24 @@
-﻿namespace Caravan.Logic
+﻿using System.Xml.Linq;
+
+namespace Caravan.Logic
 {
     public class Caravan
     {
+        private class Node
+        {
+            public Node(PackAnimal packAnimal, Node? next)
+            {
+                PackAnimal = packAnimal;
+                Next = next;
+            }
+            public PackAnimal PackAnimal { get; set; }
+            public Node? Next { get; set; }
+        }
+
+        #region fields
+        private Node? _first = null;
+        #endregion fields
+
         public Caravan()
         {
         }
@@ -13,7 +30,15 @@
         {
             get
             {
-                return -1;
+                int result = 0;
+                Node? run = _first;
+
+                while (run != null)
+                {
+                    result++;
+                    run = run.Next;
+                }
+                return result;
             }
         }
 
@@ -24,7 +49,15 @@
         {
             get
             {
-                return -1;
+                int result = 0;
+                Node? run = _first;
+
+                while (run != null)
+                {
+                    result += run.PackAnimal.Load;
+                    run = run.Next;
+                }
+                return result;
             }
         }
 
@@ -38,7 +71,18 @@
         {
             get
             {
-                return null;
+                PackAnimal? result = null;
+                Node? run = _first;
+
+                while (run != null && result == null)
+                {
+                    if (run.PackAnimal.Name == name)
+                    {
+                        result = run.PackAnimal;
+                    }
+                    run = run.Next;
+                }
+                return result;
             }
         }
 
@@ -53,7 +97,20 @@
         {
             get
             {
-                return null;
+                int pos = 0;
+                PackAnimal? result = null;
+                Node? run = _first;
+
+                while (run != null && result == null)
+                {
+                    if (pos == index)
+                    {
+                        result = run.PackAnimal;
+                    }
+                    pos++;
+                    run = run.Next;
+                }
+                return result;
             }
         }
 
@@ -66,7 +123,15 @@
         {
             get
             {
-                return -1;
+                int result = 0;
+                Node? run = _first;
+
+                while (run != null)
+                {
+                    result++;
+                    run = run.Next;
+                }
+                return result;
             }
         }
 
@@ -77,6 +142,22 @@
         /// <param name="packAnimal">einzufügendes Tragtier</param>
         public void AddPackAnimal(PackAnimal packAnimal)
         {
+            if (_first == null && packAnimal != null)
+            {
+                _first = new Node(packAnimal, _first);
+                packAnimal.MyCaravan = this;
+            }
+            else if (_first != null && packAnimal != null && Exists(packAnimal) == false)
+            {
+                Node run = _first;
+
+                while (run.Next != null)
+                {
+                    run = run.Next;
+                }
+                run.Next = new Node(packAnimal, run.Next);
+                packAnimal.MyCaravan = this;
+            }
         }
 
         /// <summary>
@@ -92,6 +173,13 @@
         /// </summary>
         public void Unload()
         {
+            Node? run = _first;
+
+            while (run != null)
+            {
+                run.PackAnimal.Load = 0;
+                run = run.Next;
+            }
         }
 
         /// <summary>
@@ -104,5 +192,20 @@
         {
         }
 
+        private bool Exists(PackAnimal packAnimal)
+        {
+            bool result = false;
+            Node? run = _first;
+
+            while (run != null && result == false)
+            {
+                if (run.PackAnimal == packAnimal)
+                {
+                    result = true;
+                }
+                run = run.Next;
+            }
+            return result;
+        }
     }
 }
